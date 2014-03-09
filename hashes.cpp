@@ -67,6 +67,12 @@ string get_type() {
 }
 
 template<typename T>
+inline void print_time(int n, string what, double dt) {
+  printf("%12s %10d %s, %5.2lf s, %8.0lf %s/s\n",
+      get_type<T>().c_str(), n, what.c_str(), dt, 1.0*n/dt, what.c_str());
+}
+
+template<typename T>
 void insert_all(T &my, const vector<my_value_t> &sample, int seed) {
   srand(seed);
 
@@ -79,8 +85,23 @@ void insert_all(T &my, const vector<my_value_t> &sample, int seed) {
   double dt = delay(start_time);
 
   assert((int)my.size() == n);
-  printf("%12s %10d ins, %5.2lf s, %8.0lf ins/s\n",
-      get_type<T>().c_str(), n, dt, n/dt);
+  print_time<T>(n, "ins", dt);
+}
+
+template<typename T>
+void find_all(T &my, const vector<my_value_t> &sample, int seed) {
+  srand(seed);
+
+  int n = sample.size();
+  assert((int)my.size() == n);
+
+  clock_t start_time = clock();
+  for(auto t : sample)
+    assert(my.find(t.first)->first == t.first);
+  double dt = delay(start_time);
+
+  assert((int)my.size() == n);
+  print_time<T>(n, "fnd", dt);
 }
 
 template<typename T>
@@ -97,26 +118,26 @@ void erase_all(T &my, vector<my_value_t> sample, int seed) {
   double dt = delay(start_time);
 
   assert((int)my.size() == 0);
-  printf("%12s %10d era, %5.2lf s, %8.0lf era/s\n", 
-      get_type<T>().c_str(), n, dt, n/dt);
+  print_time<T>(n, "era", dt);
 }
 
 template<typename T>
 void benchmark(int n, int seed) {
-  T myH;
+  T my;
 
   vector<my_value_t> sample;
   
-  gen_test(n, sample, seed);
-  insert_all(myH, sample, seed);
-  erase_all(myH, sample, seed);
+  gen_test  ( n, sample, seed);
+  insert_all(my, sample, seed);
+  find_all  (my, sample, seed);
+  erase_all (my, sample, seed);
   
-  //myH.insert(my_value_t("hello", 5));
-  //myH.insert(my_value_t("hi", 3));
-  //myH.insert(my_value_t("alabala", 2));
-  //myH.insert(my_value_t("world", 1));
+  //my.insert(my_value_t("hello", 5));
+  //my.insert(my_value_t("hi", 3));
+  //my.insert(my_value_t("alabala", 2));
+  //my.insert(my_value_t("world", 1));
 
-  //for(auto p : myH)
+  //for(auto p : my)
   //  printf("%s -> %s\n", p.first.c_str(), p.second.c_str());
 }
 

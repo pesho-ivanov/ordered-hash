@@ -2,55 +2,54 @@
 #include<map>
 #include<utility>
 
+/*               map    ordered_hash   hash/unordered_map
+ *    insert:   logN        logN              1
+ *     erase:   logN        logN (1?)         1
+ *      find:   logN         1                1
+ * next/prev:   logN        logN (1?)         N
+ *    sorted:     N          N              NlogN
+ * */
 template <typename _Key, typename _Tp>
 class ordered_hash {
  public:
-  typedef _Key                                  key_type;
-  typedef _Tp                                   data_type;
-  typedef std::pair<key_type, data_type>        value_type;
+  typedef _Key                                key_type;
+  typedef _Tp                                 data_type;
+  typedef std::pair<key_type, data_type>      value_type;
 
  private:
-  //char* comparison
-  //struct str_cmp {
-  //  bool operator()(const char *s1, const char *s2) {
-  //    return strcmp(s1, s2) < 0;
-  //  }
-  //};
+  typedef std::map<key_type, data_type>       ordered_t;
+  typedef std::unordered_map<key_type,
+          typename ordered_t::iterator>       unordered_t;
 
-  typedef std::unordered_map<key_type, data_type>   unordered_t;
-  typedef std::map<key_type, data_type>             ordered_t;
-
+  // containters
   unordered_t H;
   ordered_t M;
 
  public:
-  typedef typename unordered_t::const_iterator  const_unordered_iterator;
-  typedef typename ordered_t::const_iterator    const_iterator;
+  typedef typename ordered_t::iterator        iterator;
+  typedef typename ordered_t::const_iterator  const_iterator;
 
   const_iterator begin() { return M.begin(); }
   const_iterator end() { return M.end(); }
       
   void insert(const value_type &val) {
-    H.insert(val);
-    M.insert(val);
-  }
-
-  const_unordered_iterator unordered_find(const key_type &key) {
-    return H.find(key);
+    std::pair<iterator, bool> el = M.insert(val);
+    H.insert( make_pair(val.first, el.first) );
   }
 
   const_iterator find(const key_type &key) {
-    return M.find(key);
+    auto it = H.find(key);
+    return it != H.end() ? it->second : M.end();
   }
 
   void erase(const key_type &key) {
+    M.erase(key); // TODO: not erasing from M
     H.erase(key);
-    M.erase(key);
   }
 
   int size() {
-    assert(M.size() == H.size());
-    return M.size();
+    //assert(M.size() == H.size());
+    return H.size();
   }
 
   void clear() {
