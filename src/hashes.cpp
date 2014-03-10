@@ -6,48 +6,42 @@
 #include <cassert>
 #include <ctime>
 #include <typeinfo>
+#include "memory_check.h"
 
 #include "ordered_hash.h"
+#include "ordered_hash_faster.h"
 using namespace std;
 
-const int S_LEN       = 15;
 const int MAX_INT     = int(1e9);
 
 typedef string                      my_key_t;
 typedef int                         my_data_t;
 typedef pair<my_key_t, my_data_t>   my_value_t;
 
-typedef ordered_hash<my_key_t, my_data_t>   ordered_hash_t;
-typedef map<my_key_t, my_data_t>            map_t;
-typedef unordered_map<my_key_t, my_data_t>  hash_t;
+typedef ordered_hash<my_key_t, my_data_t>         ordered_hash_t;
+typedef ordered_hash_faster<my_key_t, my_data_t>  ordered_hash_faster_t;
+typedef map<my_key_t, my_data_t>                  map_t;
+typedef unordered_map<my_key_t, my_data_t>        hash_t;
 
-template<typename T>
-T gen() {
-  assert(false);
-  return T();
-}
-
-template<>
-string gen<string>() {
+string gen_string(int len) {
   string s;
 
-  for(int i=0; i<S_LEN; i++)
+  for(int i=0; i<len; i++)
     s.push_back('A' + rand()%26 + (rand()%2 ? 0 : ('a' - 'A')));
 
   return s;
 }
 
-template<>
-int gen<int>() {
+int gen_int() {
   return rand() % MAX_INT;
 }
 
-void gen_test(int n, vector<my_value_t> &sample, int seed) {
+void gen_test(int n, int len, vector<my_value_t> &sample, int seed) {
   srand(seed);
 
   for(int i=0; i<n; i++) {
-    auto key  = gen<typename my_value_t::first_type>();
-    auto data = gen<typename my_value_t::second_type>();
+    auto key  = gen_string(len);
+    auto data = gen_int();
     sample.push_back( my_value_t(key, data) );
   }
 }
@@ -71,9 +65,19 @@ string get_type() {
 }
 
 template<typename T>
-inline void print_time(int n, string what, double dt) {
-  printf("%12s %10d %s, %5.2lf s, %8.0lf %s/s\n",
-      get_type<T>().c_str(), n, what.c_str(), dt, 1.0*n/dt, what.c_str());
+inline void print_benchmark(int n, int len) {
+  printf("%13s elements: %10d, key_len: %8d\n", get_type<T>().c_str(), n, len);
+}
+
+template<typename T>
+inline void print_delay(int n, string what, double dt) {
+  printf("%5.2lf s, %8.0lf %s/s\n", dt, 1.0*n/dt, what.c_str());
+}
+
+void print_memory() {
+  double vm, rss;
+  process_mem_usage(vm, rss);
+  printf(" VM: %.0lfmb; RSS: %.0lfmb --> ", vm/1024.0, rss/1024);
 }
 
 template<typename T>
@@ -89,7 +93,7 @@ void insert_all(T &my, const vector<my_value_t> &sample, int seed) {
   double dt = delay(start_time);
 
   assert((int)my.size() == n);
-  print_time<T>(n, "ins", dt);
+  print_delay<T>(n, "ins", dt);
 }
 
 template<typename T>
@@ -105,7 +109,7 @@ void find_all(T &my, const vector<my_value_t> &sample, int seed) {
   double dt = delay(start_time);
 
   assert((int)my.size() == n);
-  print_time<T>(n, "fnd", dt);
+  print_delay<T>(n, "fnd", dt);
 }
 
 template<typename T>
@@ -122,28 +126,32 @@ void erase_all(T &my, vector<my_value_t> sample, int seed) {
   double dt = delay(start_time);
 
   assert((int)my.size() == 0);
-  print_time<T>(n, "era", dt);
+  print_delay<T>(n, "era", dt);
 }
 
 template<typename T>
-void benchmark(int n, int seed) {
+void benchmark(int n, int len, int seed) {
   T my;
 
   vector<my_value_t> sample;
-  gen_test  ( n, sample, seed);
+  gen_test(n, len, sample, seed);
+  print_benchmark<T>(n, len);
 
+  print_memory();
   insert_all(my, sample, seed);
+  print_memory();
   find_all  (my, sample, seed);
+  print_memory();
   erase_all (my, sample, seed);
 }
 
 template<typename T1, typename T2>
-void verify(int n, int seed) {
+void verify(int n, int len, int seed) {
   T1 my1;
   T2 my2;
 
   vector<my_value_t> sample;
-  gen_test(n, sample, seed);
+  gen_test(n, len, sample, seed);
 
   for(auto t : sample) {
     my1.insert(t);
@@ -168,17 +176,20 @@ void verify(int n, int seed) {
   }
 }
 
-void compare(int n, int seed) {
-  benchmark< map_t >           (n, seed);
-  benchmark< ordered_hash_t >  (n, seed);
-  benchmark< hash_t >          (n, seed);
+void compare(int n, int len, int seed) {
+  benchmark< map_t >                  (n, len, seed);
+  benchmark< ordered_hash_t >         (n, len, seed);
+  benchmark< ordered_hash_faster_t >  (n, len, seed);
+  benchmark< hash_t >                 (n, len, seed);
 }
 
 int main() {
-  verify<map_t, ordered_hash_t>(200, 42+1);
+  verify<map_t, ordered_hash_t>(200, 10, 42-1);
+  //verify<map_t, ordered_hash_faster_t>(200, 10, 42-1);
 
-  compare(400000, 42 + 0);
-//  compare(1000000, 42 + 1);
+  //compare( 1000000,   10, 42+0 );
+  //compare( 1000000,  100, 42+1 );
+  compare( 100000,    100, 42+3 );
   
   return 0;
 }

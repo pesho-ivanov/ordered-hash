@@ -4,10 +4,17 @@
 
 /*               map    ordered_hash   hash/unordered_map
  *    insert:   logN        logN              1
- *     erase:   logN        logN (1?)         1
+ *     erase:   logN       logN(1?)           1
  *      find:   logN         1                1
- * next/prev:   logN        logN (1?)         N
- *    sorted:     N          N              NlogN
+ * next/prev:  logN(am)    logN(1?)          n/a(N)
+ *    sorted:    N(am)       N(am)         n/a(NlogN)
+ *
+ *    TODO: table with complexities,
+ *          table with times ()
+ *          table with memory (1x3)
+ *    TODO: erase in O(1)
+ *          next/prev in O(1)
+ *
  * */
 template <typename _Key, typename _Tp>
 class ordered_hash {
@@ -21,6 +28,7 @@ class ordered_hash {
   typedef std::unordered_map<key_type,
           typename ordered_t::iterator>       unordered_t;
 
+  // memory comparison
   // containters
   unordered_t H;
   ordered_t M;
