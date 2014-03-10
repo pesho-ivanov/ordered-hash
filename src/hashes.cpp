@@ -19,6 +19,7 @@ typedef pair<my_key_t, my_data_t>   my_value_t;
 
 typedef ordered_hash<my_key_t, my_data_t>   ordered_hash_t;
 typedef map<my_key_t, my_data_t>            map_t;
+typedef unordered_map<my_key_t, my_data_t>  hash_t;
 
 template<typename T>
 T gen() {
@@ -63,6 +64,9 @@ string get_type() {
   if (typeid(T).name() == typeid(map_t).name())
     return "map";
 
+  if (typeid(T).name() == typeid(hash_t).name())
+    return "hash";
+
   return "other";
 }
 
@@ -97,7 +101,7 @@ void find_all(T &my, const vector<my_value_t> &sample, int seed) {
 
   clock_t start_time = clock();
   for(auto t : sample)
-    assert(my.find(t.first)->first == t.first);
+    my.find(t.first);
   double dt = delay(start_time);
 
   assert((int)my.size() == n);
@@ -126,29 +130,55 @@ void benchmark(int n, int seed) {
   T my;
 
   vector<my_value_t> sample;
-  
   gen_test  ( n, sample, seed);
+
   insert_all(my, sample, seed);
   find_all  (my, sample, seed);
   erase_all (my, sample, seed);
-  
-  //my.insert(my_value_t("hello", 5));
-  //my.insert(my_value_t("hi", 3));
-  //my.insert(my_value_t("alabala", 2));
-  //my.insert(my_value_t("world", 1));
+}
 
-  //for(auto p : my)
-  //  printf("%s -> %s\n", p.first.c_str(), p.second.c_str());
+template<typename T1, typename T2>
+void verify(int n, int seed) {
+  T1 my1;
+  T2 my2;
+
+  vector<my_value_t> sample;
+  gen_test(n, sample, seed);
+
+  for(auto t : sample) {
+    my1.insert(t);
+    my2.insert(t);
+    assert( equal(my1.begin(), my1.end(), my2.begin()) );
+  }
+
+  assert(my1.find("alabalanica") == my1.end());
+  assert(my2.find("alabalanica") == my2.end());
+  for(auto t : sample) {
+    assert(my1.find(t.first) != my1.end());
+    assert(my1.find(t.first)->first == t.first);
+    assert(my2.find(t.first) != my2.end());
+    assert(my2.find(t.first)->first == t.first);
+  }
+
+  random_shuffle(sample.begin(), sample.end());
+  for(auto t : sample) {
+    my1.erase(t.first);
+    my2.erase(t.first);
+    assert( equal(my1.begin(), my1.end(), my2.begin()) );
+  }
 }
 
 void compare(int n, int seed) {
-  benchmark< ordered_hash_t > (n, seed);
-  benchmark< map_t > (n, seed);
+  benchmark< map_t >           (n, seed);
+  benchmark< ordered_hash_t >  (n, seed);
+  benchmark< hash_t >          (n, seed);
 }
 
 int main() {
-//  compare(200000, 42 + 0);
-  compare(1000000, 42 + 1);
+  verify<map_t, ordered_hash_t>(200, 42+1);
+
+  compare(400000, 42 + 0);
+//  compare(1000000, 42 + 1);
   
   return 0;
 }

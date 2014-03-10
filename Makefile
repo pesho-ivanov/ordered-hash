@@ -1,4 +1,7 @@
 
-hashes: hashes.cpp ordered_hash.h
-	g++ hashes.cpp -o hashes -O2 -Wall -Wfatal-errors -std=c++11
+run: bin/hashes
+	./bin/hashes
+
+bin/hashes: src/hashes.cpp src/ordered_hash.h
+	g++ src/hashes.cpp -o bin/hashes -O2 -Wall -Wfatal-errors -std=c++11
 
