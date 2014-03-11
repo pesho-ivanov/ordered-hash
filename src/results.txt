@@ -1,0 +1,61 @@
+g++ -I /home/cheater/workspace/libs/boost_1_55_0/ src/hashes.cpp -o bin/hashes -Wall -Wfatal-errors -std=c++11
+
+map elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  5.68 s,   176056 ins/s
+ VM: 187mb; RSS: 184mb -->  6.17 s,   162075 fnd/s
+ VM: 187mb; RSS: 184mb -->  6.86 s,   145773 era/s
+ ordered_hash elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  7.09 s,   141044 ins/s
+ VM: 214mb; RSS: 212mb -->  0.82 s,  1219512 fnd/s
+ VM: 214mb; RSS: 212mb -->  8.70 s,   114943 era/s
+         hash elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  1.00 s,  1000000 ins/s
+ VM: 184mb; RSS: 181mb -->  1.33 s,   751880 fnd/s
+ VM: 184mb; RSS: 181mb -->  2.43 s,   411523 era/s
+
+Notes:
+ * ordered_hash finds are much quicker than map finds
+ * ordered_hash finds are quicker than hash finds!
+
+------------------------------------------
+g++ -I /home/cheater/workspace/libs/boost_1_55_0/ src/hashes.cpp -o bin/hashes -Wall -Wfatal-errors -std=c++11
+
+          map elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  3.51 s,   284900 ins/s
+ VM: 187mb; RSS: 184mb -->  3.63 s,   275482 fnd/s
+ VM: 187mb; RSS: 184mb -->  4.75 s,   210526 era/s
+ ordered_hash elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  4.66 s,   214592 ins/s
+ VM: 214mb; RSS: 212mb -->  0.56 s,  1785714 fnd/s
+ VM: 214mb; RSS: 212mb -->  5.51 s,   181488 era/s
+ordered_hash_faster elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  4.72 s,   211864 ins/s
+ VM: 214mb; RSS: 212mb -->  0.84 s,  1190476 fnd/s
+ VM: 214mb; RSS: 212mb -->  1.16 s,   862069 era/s
+         hash elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  0.89 s,  1123596 ins/s
+ VM: 184mb; RSS: 181mb -->  0.51 s,  1960784 fnd/s
+ VM: 184mb; RSS: 181mb -->  1.12 s,   892857 era/s
+
+ Notes:
+  * ordered_hash_faster's find is slower than ordered_hash's
+
+--------------------------------------------
+g++ -I /home/cheater/workspace/libs/boost_1_55_0/ src/hashes.cpp -o bin/hashes -O2 -Wall -Wfatal-errors -std=c++11
+
+          map elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 153mb -->  2.36 s,   423729 ins/s
+ VM: 187mb; RSS: 184mb -->  2.48 s,   403226 fnd/s
+ VM: 187mb; RSS: 184mb -->  3.38 s,   295858 era/s
+ ordered_hash elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  3.12 s,   320513 ins/s
+ VM: 214mb; RSS: 212mb -->  0.40 s,  2500000 fnd/s
+ VM: 214mb; RSS: 212mb -->  3.90 s,   256410 era/s
+ordered_hash_faster elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  3.13 s,   319489 ins/s
+ VM: 214mb; RSS: 212mb -->  0.51 s,  1960784 fnd/s
+ VM: 214mb; RSS: 212mb -->  0.91 s,  1098901 era/s
+         hash elements:    1000000, key_len:      100
+ VM: 156mb; RSS: 154mb -->  0.60 s,  1666667 ins/s
+ VM: 184mb; RSS: 181mb -->  0.38 s,  2631579 fnd/s
+ VM: 184mb; RSS: 181mb -->  0.87 s,  1149425 era/s

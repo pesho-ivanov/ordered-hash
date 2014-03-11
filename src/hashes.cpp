@@ -54,6 +54,9 @@ template<typename T>
 string get_type() {
   if (typeid(T).name() == typeid(ordered_hash_t).name())
     return "ordered_hash";
+
+  if (typeid(T).name() == typeid(ordered_hash_faster_t).name())
+    return "ordered_hash_faster";
   
   if (typeid(T).name() == typeid(map_t).name())
     return "map";
@@ -189,7 +192,7 @@ int main() {
 
   //compare( 1000000,   10, 42+0 );
   //compare( 1000000,  100, 42+1 );
-  compare( 100000,    100, 42+3 );
+  compare( 1000000,    100, 42+3 );
   
   return 0;
 }

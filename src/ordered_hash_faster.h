@@ -18,42 +18,48 @@ class ordered_hash_faster {
   typedef std::pair<key_type, data_type>      value_type;
 
  private:
-  typedef std::map<key_type, data_type>       ordered_t;
-  typedef std::unordered_map<key_type,
-          typename ordered_t::iterator>       unordered_t;
+  typedef std::map<key_type, data_type>               ordered_t;
+  typedef typename ordered_t::iterator                full_iterator;
+  typedef std::unordered_map<key_type, full_iterator> unordered_t;
 
+  class is_in_hash {
+    unordered_t * const _H;
+
+   public:
+    is_in_hash(unordered_t &__H) : _H(&__H) {}
+
+    bool operator()(const value_type &x) {
+      return _H->find(x.first) != _H->end();
+    }
+  };
+  
   // containters
   unordered_t H;
   ordered_t M;
 
-  typedef typename ordered_t::iterator        full_iterator;
-
-  struct is_in_hash {
-    bool operator()(const value_type &x) {
-      return find(x.first) != M.end();
-    }
-  };
-  
   // predicate for erased elements
   is_in_hash predicate;
 
  public:
+  ordered_hash_faster() : predicate(H) {}
+
   typedef boost::filter_iterator<is_in_hash, full_iterator> iterator;
   
-  iterator begin() { return iterator(M.begin(), M.end()); }
-  iterator end() { return iterator(M.end(), M.end()); }
+  iterator begin() { return iterator(predicate, M.begin(), M.end()); }
+  iterator end() { return iterator(predicate, M.end(), M.end()); }
       
   void insert(const value_type &val) {
-    //std::pair<iterator, bool> el = M.insert(val);
-    //H.insert( make_pair(val.first, el.first) );
+    std::pair<full_iterator, bool> el = M.insert(val);
+    H.insert( make_pair(val.first, el.first) );
   }
 
   iterator find(const key_type &key) {
-    std::pair<key_type, full_iterator> it = H.find(key);
-    //if (it != H.end())
-    //  return iterator(it->second, M.end());
-    //else
-    //  return iterator(is_in_hash, M.end(), M.end());
+    typename unordered_t::iterator it = H.find(key);
+
+    if (it != H.end())
+      return iterator(predicate, it->second, M.end());
+    else
+      return iterator(predicate, M.end(), M.end());
   }
 
   void erase(const key_type &key) {
