@@ -44,18 +44,23 @@ ordered_hash_faster elements:    1000000, key_len:      100
 g++ -I /home/cheater/workspace/libs/boost_1_55_0/ src/hashes.cpp -o bin/hashes -O2 -Wall -Wfatal-errors -std=c++11
 
           map elements:    1000000, key_len:      100
- VM: 156mb; RSS: 153mb -->  2.36 s,   423729 ins/s
- VM: 187mb; RSS: 184mb -->  2.48 s,   403226 fnd/s
- VM: 187mb; RSS: 184mb -->  3.38 s,   295858 era/s
+ VM: 156mb; RSS: 153mb -->  2.32 s,   431034 ins/s
+ VM: 187mb; RSS: 184mb -->  2.47 s,   404858 fnd/s
+ VM: 187mb; RSS: 184mb -->  0.24 s,  4166667 inc/s
+ VM: 187mb; RSS: 184mb -->  3.34 s,   299401 era/s
  ordered_hash elements:    1000000, key_len:      100
- VM: 156mb; RSS: 154mb -->  3.12 s,   320513 ins/s
+ VM: 156mb; RSS: 154mb -->  3.14 s,   318471 ins/s
  VM: 214mb; RSS: 212mb -->  0.40 s,  2500000 fnd/s
- VM: 214mb; RSS: 212mb -->  3.90 s,   256410 era/s
+ VM: 214mb; RSS: 212mb -->  0.21 s,  4761905 inc/s
+ VM: 214mb; RSS: 212mb -->  3.87 s,   258398 era/s
 ordered_hash_faster elements:    1000000, key_len:      100
  VM: 156mb; RSS: 154mb -->  3.13 s,   319489 ins/s
  VM: 214mb; RSS: 212mb -->  0.51 s,  1960784 fnd/s
- VM: 214mb; RSS: 212mb -->  0.91 s,  1098901 era/s
+ VM: 214mb; RSS: 212mb -->  0.82 s,  1219512 inc/s
+ VM: 214mb; RSS: 212mb -->  0.92 s,  1086957 era/s
          hash elements:    1000000, key_len:      100
- VM: 156mb; RSS: 154mb -->  0.60 s,  1666667 ins/s
- VM: 184mb; RSS: 181mb -->  0.38 s,  2631579 fnd/s
+ VM: 156mb; RSS: 154mb -->  0.61 s,  1639344 ins/s
+ VM: 184mb; RSS: 181mb -->  0.37 s,  2702703 fnd/s
+ VM: 184mb; RSS: 181mb -->  0.12 s,  8333333 inc/s
  VM: 184mb; RSS: 181mb -->  0.87 s,  1149425 era/s
+

@@ -116,6 +116,18 @@ void find_all(T &my, const vector<my_value_t> &sample, int seed) {
 }
 
 template<typename T>
+void trace_all(T &my) {
+  int n = my.size();
+
+  clock_t start_time = clock();
+  for(auto t : my)
+    ;
+  double dt = delay(start_time);
+
+  print_delay<T>(n, "inc", dt);
+}
+
+template<typename T>
 void erase_all(T &my, vector<my_value_t> sample, int seed) {
   srand(seed);
 
@@ -144,6 +156,8 @@ void benchmark(int n, int len, int seed) {
   insert_all(my, sample, seed);
   print_memory();
   find_all  (my, sample, seed);
+  print_memory();
+  trace_all (my);
   print_memory();
   erase_all (my, sample, seed);
 }
