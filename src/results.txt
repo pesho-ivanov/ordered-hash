@@ -64,3 +64,5 @@ ordered_hash_faster elements:    1000000, key_len:      100
  VM: 184mb; RSS: 181mb -->  0.12 s,  8333333 inc/s
  VM: 184mb; RSS: 181mb -->  0.87 s,  1149425 era/s
 
+  Notes:
+   * ordered_hash_faster has O(1) erase but finds and increments are slower because of the filter_iterator
