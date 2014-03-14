@@ -1,0 +1,60 @@
+
+
+
+** Ordered hash data structure
+
+  For now on we will call a key a specific hashable and comparable object and we will call a data any specific object.
+
+  The introduced data structure Ordered hash consists of a balanced search tree [???] T and a hash map H [???]. The main aim of integrating a hash table to a search tree is to speed-up the find operation while dynamically maintaining the order of the elements in the tree. Each element of T contains a key field (by which it is ordered) and a data field. H maps keys to address pointers to T elements.
+
+The main operations of the introduced ordered_hash work as follows:
+ -- insert(key, value):
+    1) inserts the (key, value) pair into T as an element pointed by p,
+    2) inserts the (key, p) pair into H.
+ -- find(key):
+    1) searches for key in H
+    2) if key is found in H then returns a pointer to key in T
+ -- erase(key):
+    1) erases key from H
+    2) erases key from T
+ -- next(T-pointer) and prev(T-pointer)
+    1) returns the next/prev pointer
+
+** Implementation details
+  Ordered hash is implemented as a STL-consistent C++ class. It is templated by key_type and data_type. The type of T is the STL map<key_type, data_type>. The type of H is the STL hash_map<key_type, T-iterator>.
+
+  typedef std::map<key_type, data_type>       ordered_t;
+  typedef std::unordered_map<key_type,
+          typename ordered_t::iterator>       unordered_t;
+
+  C++ STL.
+  The map specification guarantees that elements do not change their address.
+  Memory optimization:
+    H: key->iterator    ---->    H: key_hash->iterator
+
+** The erase optimization
+  Ordered hash erase optimized
+
+** The next/prev optimization
+  ...
+
+** Complexity comparison
+  In case the hash tables maintains an amortized constant insert, find and erase operations (which is the case in STL hash [???])
+
+  table with complexities
+
+** Experimental results
+   -- toy data
+  table with times 
+
+   -- real data
+  table with times 
+
+   * ordered_hash finds are much quicker than map finds
+   * ordered_hash finds are quicker than hash finds!
+   * ordered_hash_faster's find is slower than ordered_hash's
+   * ordered_hash_faster has O(1) erase but finds and increments are slower because of the filter_iterator
+
+** Other structures
+  The described ordered_hash_map class can be extended to analogous ordered_hash_multimap, ordered_hash_set and ordered_hash_multiset.
+  Trie -- not by comparison
