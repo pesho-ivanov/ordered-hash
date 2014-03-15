@@ -1,6 +1,4 @@
 
-
-
 ** Ordered hash data structure
 
   For now on we will call a key a specific hashable and comparable object and we will call a data any specific object.
@@ -21,27 +19,29 @@ The main operations of the introduced ordered_hash work as follows:
     1) returns the next/prev pointer
 
 ** Implementation details
-  Ordered hash is implemented as a STL-consistent C++ class. It is templated by key_type and data_type. The type of T is the STL map<key_type, data_type>. The type of H is the STL hash_map<key_type, T-iterator>.
+  The proposed C++ class ordered_hash is fully STL-consistent. It has the same interface as STL map so as to be easily interchanged in existing projects. The class ordered_hash is templated by key_type and data_type. The type ordered_t of T is defined by the STL map<key_type, data_type>. The type unordered_t of H is defined by the STL unordered_map<key_type, ordered_t::iterator>. (Note that the map specification guarantees that elements do not change their address.)
 
-  typedef std::map<key_type, data_type>       ordered_t;
-  typedef std::unordered_map<key_type,
-          typename ordered_t::iterator>       unordered_t;
-
-  C++ STL.
-  The map specification guarantees that elements do not change their address.
+  The overhead memory usage of this implementation against map is about Theta(N)
   Memory optimization:
     H: key->iterator    ---->    H: key_hash->iterator
 
+** Complexities
+  All the operations on map are available on ordered_hash with the same time and memory complexities except the find operation which runs in O(1). Note that if the number of elements to be inserted is not known ahead, the complexities of insertion and erasion in hash tables are only amortized O(1) over multiple calls (because of hash table resizing).
+  The insertion into ordered_hash consists of insertion into a map for O(logN) and insertion into a hash for O(1).
+  The transitions to the next and to the previous element in the ordered set are done traversing the tree. The maximum edge-distance between sequential elements is at most O(logN) but amortized over iterating the whole tree the average distance is O(1) (because every edge is traversed exactly twice -- downwards and upwards).
+
+                 map    ordered_hash  ordered_hash*  hash/unordered_map
+      insert:   logN        logN          logN*              1
+       erase:   logN        logN           1                 1
+        find:   logN         1             1                 1
+   next/prev:   logN        logN          logN*           n/a or N
+  all sorted:     N          N             N*           n/a or NlogN
+
 ** The erase optimization
-  Ordered hash erase optimized
+  Instead of erasing an element from both the hash and the tree, it can be only erased from the hash. Searching for an element will be unsuccessful if the element is not found in the hash. This optimizes the erase operation to O(1). Some additional work not increasing the complexity is to be done when traversing the tree: every element has to be checked on whether it was not erased from the hash. Another implication of not physically erasing elements is that the iteration time is no more dependent on the number of elements N logically contained in the structure but on the number of elements N* ever inserted.
 
 ** The next/prev optimization
-  ...
-
-** Complexity comparison
-  In case the hash tables maintains an amortized constant insert, find and erase operations (which is the case in STL hash [???])
-
-  table with complexities
+  It is possible to ...
 
 ** Experimental results
    -- toy data
