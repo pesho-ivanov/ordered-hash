@@ -44,8 +44,7 @@ The main operations of the introduced ordered_hash work as follows:
   all sorted:     N          N             N*           n/a or NlogN
 
 ** The erase optimization
-  Instead of erasing an element from both the hash and the tree, it can be only erased from the hash. Searching for an element will be unsuccessful if the element is not found in the hash. This optimizes the erase operation to O(1). Some additional work not increasing the complexity is to be done when traversing the tree: every element has to be checked on whether it was not erased from the hash. Another implication of not physically erasing elements is that the iteration time is no more dependent on the number of elements N logically contained in the structure but on the number of elements N* ever inserted.
-  Ordered_hash with the erase optimization is referred with a star.
+  Instead of erasing an element from both the hash and the tree, it can be only erased from the hash. Searching for an element will be unsuccessful if the element is not found in the hash. This optimizes the erase operation to O(1). Some additional work not increasing the complexity is to be done when traversing the tree: every element has to be checked on whether it was not erased from the hash. Another implication of not physically erasing elements is that the iteration time is no more dependent on the number of elements N logically contained in the structure but on the number of elements N* ever inserted. Ordered_hash with the erase optimization is referred with a star.
 
 ** The next/prev optimization
   It is also possible to lower the complexity of the transitions to O(1) by maintaining two additional pointers (for the next and the previous element) for every element in the tree. This modification was not implemented in the current STL probably because the expected number of operations for a transition is constant either way.
