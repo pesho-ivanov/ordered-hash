@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <set>
 
 #include <cassert>
 #include <ctime>
@@ -14,8 +15,10 @@ using namespace std;
 
 const int MAX_INT     = int(1e9);
 
-typedef string                      my_key_t;
-typedef int                         my_data_t;
+typedef int                         my_key_t;
+typedef string                      my_data_t;
+//typedef string                      my_key_t;
+//typedef int                         my_data_t;
 typedef pair<my_key_t, my_data_t>   my_value_t;
 
 typedef ordered_hash<my_key_t, my_data_t>         ordered_hash_t;
@@ -37,11 +40,22 @@ int gen_int() {
 }
 
 void gen_test(int n, int len, vector<my_value_t> &sample, int seed) {
+  set<my_key_t> S;
   srand(seed);
 
   for(int i=0; i<n; i++) {
-    auto key  = gen_string(len);
-    auto data = gen_int();
+    int key;
+    string data;
+
+    do {
+      key  = gen_int();
+      //key  = gen_string(len);
+    } while (S.find(key) != S.end());
+    
+    S.insert(key);
+
+    data = gen_string(len);
+    //data = gen_int();
     sample.push_back( my_value_t(key, data) );
   }
 }
@@ -176,8 +190,8 @@ void verify(int n, int len, int seed) {
     assert( equal(my1.begin(), my1.end(), my2.begin()) );
   }
 
-  assert(my1.find("alabalanica") == my1.end());
-  assert(my2.find("alabalanica") == my2.end());
+  //assert(my1.find("alabalanica") == my1.end());
+  //assert(my2.find("alabalanica") == my2.end());
   for(auto t : sample) {
     assert(my1.find(t.first) != my1.end());
     assert(my1.find(t.first)->first == t.first);
@@ -206,7 +220,7 @@ int main() {
 
   //compare( 1000000,   10, 42+0 );
   //compare( 1000000,  100, 42+1 );
-  compare( 1000000,    100, 42+3 );
+  compare( 1000000,    500, 42+3 );
   
   return 0;
 }

@@ -2,19 +2,16 @@
 #include<map>
 #include<utility>
 
-/*               map    ordered_hash   hash/unordered_map
+/*
+ *               map    ordered_hash   hash/unordered_map
  *    insert:   logN        logN              1
  *     erase:   logN       logN(1?)           1
  *      find:   logN         1                1
  * next/prev:  logN(am)    logN(1?)          n/a(N)
  *    sorted:    N(am)       N(am)         n/a(NlogN)
  *
- *    TODO: table with complexities,
- *          table with times ()
- *          table with memory (1x3)
- *    TODO: erase in O(1)
- *          next/prev in O(1)
- *
+ *    TODO:    H: key->iterator    ---->    H: key_hash->iterator
+ *          add to std
  * */
 template <typename _Key, typename _Tp>
 class ordered_hash {

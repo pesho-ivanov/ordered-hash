@@ -1,3 +1,9 @@
+Ordered hash: optimizing a search tree by a hash table
+
+** Abstract
+
+An integration of a hash table and a balanced search tree is proposed. The new data structure, called an ordered hash supports constant-time finds and erases and logarithmic-time insert. The open source C++ implementations are STL-style which makes the existing applications extremely easy to get optimized by simply changing the underlaying class. The ordered hash is compared to the heavily used map and unordered_map/hash_map from STL.
+
 
 ** Ordered hash data structure
 
@@ -39,15 +45,26 @@ The main operations of the introduced ordered_hash work as follows:
 
 ** The erase optimization
   Instead of erasing an element from both the hash and the tree, it can be only erased from the hash. Searching for an element will be unsuccessful if the element is not found in the hash. This optimizes the erase operation to O(1). Some additional work not increasing the complexity is to be done when traversing the tree: every element has to be checked on whether it was not erased from the hash. Another implication of not physically erasing elements is that the iteration time is no more dependent on the number of elements N logically contained in the structure but on the number of elements N* ever inserted.
+  Ordered_hash with the erase optimization is referred with a star.
 
 ** The next/prev optimization
-  It is possible to ...
+  It is also possible to lower the complexity of the transitions to O(1) by maintaining two additional pointers (for the next and the previous element) for every element in the tree. This modification was not implemented in the current STL probably because the expected number of operations for a transition is constant either way.
 
 ** Experimental results
    -- toy data
   table with times 
 
-   -- real data
+  -- contest problems data
+
+set: http://iskren.info/info/noi/2005/k3/src/k15/burn.cpp
+set: http://iskren.info/info/lish_07/iskren/cuboid.cpp
+set: http://iskren.info/info/BaOI/2002/tr.cpp
+map with erase: http://iskren.info/info/ceoi/2000/falling.cpp
+map with cmp without erase: http://iskren.info/info/noi/2005/k3/src/k2/cut.cpp
+
+ivan gradina: some speed-up
+iskren titanic: 
+
   table with times 
 
    * ordered_hash finds are much quicker than map finds
@@ -57,4 +74,3 @@ The main operations of the introduced ordered_hash work as follows:
 
 ** Other structures
   The described ordered_hash_map class can be extended to analogous ordered_hash_multimap, ordered_hash_set and ordered_hash_multiset.
-  Trie -- not by comparison
