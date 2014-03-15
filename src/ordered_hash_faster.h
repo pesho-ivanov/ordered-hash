@@ -10,15 +10,18 @@
  * next/prev:  logN(am)    logN(1?)          n/a(N)
  *    sorted:    N(am)       N(am)         n/a(NlogN)
  * */
+
+namespace std {
+
 template <typename _Key, typename _Tp>
 class ordered_hash_faster {
  public:
   typedef _Key                                key_type;
-  typedef _Tp                                 data_type;
-  typedef std::pair<key_type, data_type>      value_type;
+  typedef _Tp                                 mapped_type;
+  typedef std::pair<key_type, mapped_type>    value_type;
 
  private:
-  typedef std::map<key_type, data_type>               ordered_t;
+  typedef std::map<key_type, mapped_type>             ordered_t;
   typedef typename ordered_t::iterator                full_iterator;
   typedef std::unordered_map<key_type, full_iterator> unordered_t;
 
@@ -76,3 +79,4 @@ class ordered_hash_faster {
   }
 };
 
+} // namespace std

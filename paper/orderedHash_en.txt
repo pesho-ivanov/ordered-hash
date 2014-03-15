@@ -27,9 +27,9 @@ The main operations of the introduced ordered_hash work as follows:
 ** Implementation details
   The proposed C++ class ordered_hash is fully STL-consistent. It has the same interface as STL map so as to be easily interchanged in existing projects. The class ordered_hash is templated by key_type and data_type. The type ordered_t of T is defined by the STL map<key_type, data_type>. The type unordered_t of H is defined by the STL unordered_map<key_type, ordered_t::iterator>. (Note that the map specification guarantees that elements do not change their address.)
 
-  The overhead memory usage of this implementation against map is about Theta(N)
-  Memory optimization:
-    H: key->iterator    ---->    H: key_hash->iterator
+  The overhead memory usage of this implementation against map is O(N*sizeof(key)). It is lowered to Theta(N) by replacing H: key->iterator to H: key_hash->iterator.
+
+  The described ordered_hash_map class can be extended to analogous ordered_hash_multimap, ordered_hash_set and ordered_hash_multiset.
 
 ** Complexities
   All the operations on map are available on ordered_hash with the same time and memory complexities except the find operation which runs in O(1). Note that if the number of elements to be inserted is not known ahead, the complexities of insertion and erasion in hash tables are only amortized O(1) over multiple calls (because of hash table resizing).
@@ -71,6 +71,3 @@ iskren titanic:
    * ordered_hash finds are quicker than hash finds!
    * ordered_hash_faster's find is slower than ordered_hash's
    * ordered_hash_faster has O(1) erase but finds and increments are slower because of the filter_iterator
-
-** Other structures
-  The described ordered_hash_map class can be extended to analogous ordered_hash_multimap, ordered_hash_set and ordered_hash_multiset.

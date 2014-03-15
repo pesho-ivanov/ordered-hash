@@ -13,15 +13,18 @@
  *    TODO:    H: key->iterator    ---->    H: key_hash->iterator
  *          add to std
  * */
+
+namespace std {
+
 template <typename _Key, typename _Tp>
 class ordered_hash {
  public:
   typedef _Key                                key_type;
-  typedef _Tp                                 data_type;
-  typedef std::pair<key_type, data_type>      value_type;
+  typedef _Tp                                 mapped_type;
+  typedef std::pair<key_type, mapped_type>    value_type;
 
  private:
-  typedef std::map<key_type, data_type>       ordered_t;
+  typedef std::map<key_type, mapped_type>     ordered_t;
   typedef std::unordered_map<key_type,
           typename ordered_t::iterator>       unordered_t;
 
@@ -63,3 +66,4 @@ class ordered_hash {
   }
 };
 
+} // namespace std

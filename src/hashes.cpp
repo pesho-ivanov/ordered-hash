@@ -15,18 +15,20 @@ using namespace std;
 
 const int MAX_INT     = int(1e9);
 
-typedef int                         my_key_t;
-typedef string                      my_data_t;
-//typedef string                      my_key_t;
-//typedef int                         my_data_t;
-typedef pair<my_key_t, my_data_t>   my_value_t;
+// TODO: delete
+typedef ordered_hash<int, string>         ordered_hash_t;
+typedef ordered_hash_faster<int, string>  ordered_hash_faster_t;
+typedef map<int, string>                  map_t;
+typedef unordered_map<int, string>        hash_t;
 
-typedef ordered_hash<my_key_t, my_data_t>         ordered_hash_t;
-typedef ordered_hash_faster<my_key_t, my_data_t>  ordered_hash_faster_t;
-typedef map<my_key_t, my_data_t>                  map_t;
-typedef unordered_map<my_key_t, my_data_t>        hash_t;
+template<typename T>
+T gen(int len) {
+  assert(false);
+  return T();
+}
 
-string gen_string(int len) {
+template<>
+string gen<string>(int len) {
   string s;
 
   for(int i=0; i<len; i++)
@@ -35,28 +37,34 @@ string gen_string(int len) {
   return s;
 }
 
-int gen_int() {
+template<>
+int gen(int len) {
+  if (len) ;
   return rand() % MAX_INT;
 }
 
-void gen_test(int n, int len, vector<my_value_t> &sample, int seed) {
-  set<my_key_t> S;
+template<typename T>
+void gen_test(int n, int len,
+    vector< pair<typename T::key_type, typename T::mapped_type> > &sample,
+    int seed) {
+  typedef typename T::key_type    key_type;
+  typedef typename T::mapped_type mapped_type;
+
+  set<key_type> S;
   srand(seed);
 
   for(int i=0; i<n; i++) {
-    int key;
-    string data;
+    key_type key;
+    mapped_type data;
 
     do {
-      key  = gen_int();
-      //key  = gen_string(len);
+      key  = gen<key_type>(len);
     } while (S.find(key) != S.end());
     
     S.insert(key);
 
-    data = gen_string(len);
-    //data = gen_int();
-    sample.push_back( my_value_t(key, data) );
+    data = gen<mapped_type>(len);
+    sample.push_back( make_pair(key, data) );
   }
 }
 
@@ -66,24 +74,16 @@ inline double delay(clock_t start_time) {
 
 template<typename T>
 string get_type() {
-  if (typeid(T).name() == typeid(ordered_hash_t).name())
-    return "ordered_hash";
+  string name = typeid(T).name();
 
-  if (typeid(T).name() == typeid(ordered_hash_faster_t).name())
-    return "ordered_hash_faster";
-  
-  if (typeid(T).name() == typeid(map_t).name())
-    return "map";
+  if (name == typeid(ordered_hash_t).name()) return "ordered_hash";
+  if (name == typeid(ordered_hash_faster_t).name()) return "ordered_hash_faster";
+  if (name == typeid(map_t).name()) return "map";
+  if (name == typeid(hash_t).name()) return "hash";
+  if (name == typeid(string).name()) return "string";
+  if (name == typeid(int).name()) return "int";
 
-  if (typeid(T).name() == typeid(hash_t).name())
-    return "hash";
-
-  return "other";
-}
-
-template<typename T>
-inline void print_benchmark(int n, int len) {
-  printf("%13s elements: %10d, key_len: %8d\n", get_type<T>().c_str(), n, len);
+  return "other: " + name;
 }
 
 template<typename T>
@@ -98,7 +98,9 @@ void print_memory() {
 }
 
 template<typename T>
-void insert_all(T &my, const vector<my_value_t> &sample, int seed) {
+void insert_all(T &my,
+    const vector< pair<typename T::key_type, typename T::mapped_type> > &sample,
+    int seed) {
   srand(seed);
 
   int n = sample.size();
@@ -114,7 +116,9 @@ void insert_all(T &my, const vector<my_value_t> &sample, int seed) {
 }
 
 template<typename T>
-void find_all(T &my, const vector<my_value_t> &sample, int seed) {
+void find_all(T &my,
+    const vector< pair<typename T::key_type, typename T::mapped_type> > &sample,
+    int seed) {
   srand(seed);
 
   int n = sample.size();
@@ -142,7 +146,9 @@ void trace_all(T &my) {
 }
 
 template<typename T>
-void erase_all(T &my, vector<my_value_t> sample, int seed) {
+void erase_all(T &my,
+    vector< pair<typename T::key_type, typename T::mapped_type> > &sample,
+    int seed) {
   srand(seed);
 
   int n = sample.size();
@@ -162,18 +168,20 @@ template<typename T>
 void benchmark(int n, int len, int seed) {
   T my;
 
-  vector<my_value_t> sample;
-  gen_test(n, len, sample, seed);
-  print_benchmark<T>(n, len);
+  vector< pair<typename T::key_type, typename T::mapped_type> > sample;
+  gen_test<T>(n, len, sample, seed);
+  printf("  Class %s\n", get_type<T>().c_str());
 
   print_memory();
-  insert_all(my, sample, seed);
+  insert_all<T>(my, sample, seed);
   print_memory();
-  find_all  (my, sample, seed);
+  find_all<T>  (my, sample, seed);
   print_memory();
-  trace_all (my);
+  trace_all<T> (my);
   print_memory();
-  erase_all (my, sample, seed);
+  erase_all<T> (my, sample, seed);
+
+  printf("\n");
 }
 
 template<typename T1, typename T2>
@@ -181,8 +189,8 @@ void verify(int n, int len, int seed) {
   T1 my1;
   T2 my2;
 
-  vector<my_value_t> sample;
-  gen_test(n, len, sample, seed);
+  vector< pair<typename T1::key_type, typename T1::mapped_type> > sample;
+  gen_test<T1>(n, len, sample, seed);
 
   for(auto t : sample) {
     my1.insert(t);
@@ -207,11 +215,15 @@ void verify(int n, int len, int seed) {
   }
 }
 
+template<typename key_t, typename mapped_t>
 void compare(int n, int len, int seed) {
-  benchmark< map_t >                  (n, len, seed);
-  benchmark< ordered_hash_t >         (n, len, seed);
-  benchmark< ordered_hash_faster_t >  (n, len, seed);
-  benchmark< hash_t >                 (n, len, seed);
+  printf(" --- Comparison of %d %s -> %s mappings, len=%d ---\n", 
+      n, get_type<key_t>().c_str(), get_type<mapped_t>().c_str(), len);
+
+  benchmark< map<key_t, mapped_t> >                  (n, len, seed);
+  benchmark< ordered_hash<key_t, mapped_t> >         (n, len, seed);
+  benchmark< ordered_hash_faster<key_t, mapped_t> >  (n, len, seed);
+  benchmark< unordered_map<key_t, mapped_t> >        (n, len, seed);
 }
 
 int main() {
@@ -220,7 +232,8 @@ int main() {
 
   //compare( 1000000,   10, 42+0 );
   //compare( 1000000,  100, 42+1 );
-  compare( 1000000,    500, 42+3 );
+  compare<int, string>( 1000000,    100, 42+3 );
+  compare<string, int>( 1000000,    100, 42+3 );
   
   return 0;
 }
