@@ -1,7 +1,7 @@
 #include<unordered_map>
 #include<map>
 #include<utility>
-#include<boost/functional/hash.hpp>
+#include<boost/functional/hash.hpp>   // hash for STL containers
 
 /*
  *               map      ordered_hash    hash/unordered_map
@@ -18,16 +18,30 @@
 
 namespace std {
 
-template <typename _Key, typename _Tp>
+template <  typename _Key,
+            typename _Tp,
+            typename _Compare = std::less<_Key>,
+	    typename _Hash = hash<_Key>,
+	    typename _Pred = std::equal_to<_Key>,
+            typename _Alloc = std::allocator<std::pair<const _Key, _Tp> >
+          >
+//template <typename _Key, typename _Tp>
 class ordered_hash {
  public:
   typedef _Key                                key_type;
   typedef _Tp                                 mapped_type;
   typedef std::pair<key_type, mapped_type>    value_type;
-  typedef size_t                              size_type;
+  typedef _Compare                            key_compare;
+  typedef _Alloc                              allocator_type;
 
  private:
-  typedef std::map<key_type, mapped_type>     ordered_t;
+  typedef std::map<
+            key_type,
+            mapped_type,
+            key_compare,
+            allocator_type
+          >                                   ordered_t;
+
   typedef std::unordered_map<
             key_type,
             typename ordered_t::iterator,
@@ -186,6 +200,15 @@ class ordered_hash {
     H.clear();
     M.clear();
   }
+
+  key_compare key_comp() const {
+    return M.key_comp();
+  }
+
+  //TODO
+  //value_compare value_comp() const {
+  //  return value_compare(_M_t.key_comp());
+  //}
 };
 
 } // namespace std
