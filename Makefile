@@ -8,3 +8,8 @@ compile: src/hashes.cpp src/ordered_hash.h
 clear:
 	rm -rf bin/*
 
+test:
+	g++ tests/test.cpp -o bin/test -O2 -Wall -std=c++11
+
+test-titanic:
+	g++ tests/titanic/titanic-ordered-hash.cpp -o bin/titanic-ordered-hash -O2 -Wall -std=c++11

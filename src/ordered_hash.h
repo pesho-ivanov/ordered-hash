@@ -50,10 +50,25 @@ class ordered_hash {
     H.insert( make_pair(val.first, el.first) );
   }
 
-  const_iterator find(const key_type &key) {
+  iterator find(const key_type &key) {
     auto it = H.find(key);
     return it != H.end() ? it->second : M.end();
   }
+
+  const_iterator find(const key_type &key) const {
+    auto it = H.find(key);
+    return it != H.end() ? it->second : M.end();
+  }
+
+  mapped_type& operator[](const key_type &key) {
+    return M[key];
+  }
+
+  // anti code-duplication: doesn't work yet
+  //iterator& find(const key_type &key) {
+  //  auto &it = static_cast<const ordered_hash &>( *this ).find(key);
+  //  return const_cast<iterator &>( it );
+  //}
 
   void erase(const key_type &key) {
     M.erase(key); // this O(logN) line is missing in ordered_hash_faster
