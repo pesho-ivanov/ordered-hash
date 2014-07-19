@@ -1,6 +1,7 @@
 #include<unordered_map>
 #include<map>
 #include<utility>
+#include<boost/functional/hash.hpp>
 
 /*
  *               map    ordered_hash   hash/unordered_map
@@ -26,8 +27,11 @@ class ordered_hash {
 
  private:
   typedef std::map<key_type, mapped_type>     ordered_t;
-  typedef std::unordered_map<key_type,
-          typename ordered_t::iterator>       unordered_t;
+  typedef std::unordered_map<
+            key_type,
+            typename ordered_t::iterator,
+            boost::hash<key_type>
+          >                                   unordered_t;
 
   // memory comparison
   // containters
@@ -52,7 +56,7 @@ class ordered_hash {
   }
 
   void erase(const key_type &key) {
-    M.erase(key); // TODO: not erasing from M
+    M.erase(key); // this O(logN) line is missing in ordered_hash_faster
     H.erase(key);
   }
 
