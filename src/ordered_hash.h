@@ -4,12 +4,12 @@
 #include<boost/functional/hash.hpp>
 
 /*
- *               map    ordered_hash   hash/unordered_map
- *    insert:   logN        logN              1
- *     erase:   logN       logN(1?)           1
- *      find:   logN         1                1
- * next/prev:  logN(am)    logN(1?)          n/a(N)
- *    sorted:    N(am)       N(am)         n/a(NlogN)
+ *               map      ordered_hash    hash/unordered_map
+ *    insert:   logN          logN                1
+ *     erase:   logN          logN                1
+ *      find:   logN           1                  1
+ * next/prev:   logN    logN / 1(amort.)  n/a (possible in N)
+ *    sorted: N(amort.)      N(amort.)   n/a (possible in NlogN)
  *
  *    TODO:    H: key->iterator    ---->    H: key_hash->iterator
  *          add to std
@@ -34,17 +34,45 @@ class ordered_hash {
             boost::hash<key_type>
           >                                   unordered_t;
 
-  // memory comparison
   // containters
   unordered_t H;
   ordered_t M;
 
  public:
-  typedef typename ordered_t::iterator        iterator;
-  typedef typename ordered_t::const_iterator  const_iterator;
+  // TODO
+  //typedef typename _Pair_alloc_type::pointer         pointer;
+  //typedef typename _Pair_alloc_type::const_pointer   const_pointer;
+  //typedef typename _Pair_alloc_type::reference       reference;
+  //typedef typename _Pair_alloc_type::const_reference const_reference;
 
-  const_iterator begin() { return M.begin(); }
-  const_iterator end() { return M.end(); }
+  typedef typename ordered_t::iterator                iterator;
+  typedef typename ordered_t::const_iterator          const_iterator;
+  typedef typename ordered_t::size_type               size_type;
+  typedef typename ordered_t::difference_type         difference_type;
+  typedef typename ordered_t::reverse_iterator        reverse_iterator;
+  typedef typename ordered_t::const_reverse_iterator  const_reverse_iterator;
+
+  ordered_hash()
+    : H(), M() {}
+
+  //TODO
+  //explicit ordered_hash(ordered_t &x) {
+  //}
+
+  ordered_hash(const ordered_hash &x)
+    : H(x.H), M(x.M) { }
+
+  ordered_hash& operator=(const ordered_hash& x) {
+    H = x.H;
+    M = x.M;
+    return *this;
+  }
+
+  // begin & end iterators
+  iterator begin() { return M.begin(); }
+  const_iterator begin() const { return M.begin(); }
+  iterator end() { return M.end(); }
+  const_iterator end() const { return M.end(); }
       
   // inserts
   pair<iterator, bool> insert(const value_type &val) {
@@ -86,6 +114,33 @@ class ordered_hash {
   //  auto &it = static_cast<const ordered_hash &>( *this ).find(key);
   //  return const_cast<iterator &>( it );
   //}
+  
+  // lower bound
+  iterator lower_bound(const key_type& x) {
+    return M.lower_bound(x);
+  }
+
+  const_iterator lower_bound(const key_type& x) const {
+    return M.lower_bound(x);
+  }
+
+  // upper bound
+  iterator upper_bound(const key_type& x) {
+    return M.upper_bound(x);
+  }
+
+  const_iterator upper_bound(const key_type& x) const {
+    return M.upper_bound(x);
+  }
+
+  // equal range
+  std::pair<iterator, iterator> equal_range(const key_type& x) {
+    return M.equal_range(x);
+  }
+
+  std::pair<const_iterator, const_iterator> equal_range(const key_type& x) const {
+    return M.equal_range(x);
+  }
 
   // erases
   void erase(iterator position) {
@@ -105,9 +160,26 @@ class ordered_hash {
   }
 
   // other
+  size_type count(const key_type& x) const {
+    return M.find(x) == M.end() ? 0 : 1;
+  }
+
+  void swap(ordered_hash& x) {
+    H.swap(x.H);
+    M.swap(x.M);
+  }
+
+  bool empty() const {
+    return M.empty();
+  }
+
   size_type size() const {
     //assert(M.size() == H.size());
-    return H.size();
+    return M.size();
+  }
+
+  size_type max_size() const {
+    return M.max_size(); // this estimate could be lowered
   }
 
   void clear() {
