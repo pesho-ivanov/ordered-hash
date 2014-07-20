@@ -1,7 +1,7 @@
 #include<unordered_map>
 #include<map>
 #include<utility>
-#include<boost/functional/hash.hpp>   // hash for STL containers
+//#include<boost/functional/hash.hpp>   // hash for STL containers
 
 /*
  *               map      ordered_hash    hash/unordered_map
@@ -20,8 +20,8 @@ namespace std {
 
 template <  typename _Key,
             typename _Tp,
-            typename _Compare = std::less<_Key>,
 	    typename _Hash = hash<_Key>,
+            typename _Compare = std::less<_Key>,
 	    typename _Pred = std::equal_to<_Key>,
             typename _Alloc = std::allocator<std::pair<const _Key, _Tp> >
           >
@@ -33,6 +33,8 @@ class ordered_hash {
   typedef std::pair<key_type, mapped_type>    value_type;
   typedef _Compare                            key_compare;
   typedef _Alloc                              allocator_type;
+  typedef _Hash                               hasher;
+  typedef _Pred                               predicate;
 
  private:
   typedef std::map<
@@ -45,7 +47,10 @@ class ordered_hash {
   typedef std::unordered_map<
             key_type,
             typename ordered_t::iterator,
-            boost::hash<key_type>
+            hasher,
+            predicate,
+            allocator_type
+            //boost::hash<key_type> // not to be used
           >                                   unordered_t;
 
   // containters

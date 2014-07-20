@@ -11,5 +11,5 @@ clear:
 test:
 	g++ tests/test.cpp -o bin/test -O2 -Wall -std=c++11
 
-test-titanic:
-	g++ tests/titanic/titanic-ordered-hash.cpp -o bin/titanic-ordered-hash -O2 -Wall -std=c++11
+titanic:
+	g++ -I /home/cheater/workspace/libs/boost_1_55_0/ tests/titanic/titanic-ordered-hash.cpp -o bin/titanic-ordered-hash -O2 -Wall -std=c++11
